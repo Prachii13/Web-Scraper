@@ -1,0 +1,33 @@
+
+---
+
+#### 🧠 `scraper.py`
+```python
+import requests
+from bs4 import BeautifulSoup
+import csv
+
+URL = "https://news.ycombinator.com/"  # You can change this
+
+def fetch_articles():
+    response = requests.get(URL)
+    soup = BeautifulSoup(response.text, 'html.parser')
+
+    articles = []
+    for item in soup.select(".athing"):
+        title = item.select_one(".titleline > a").text
+        link = item.select_one(".titleline > a")["href"]
+        articles.append((title, link))
+
+    return articles
+
+def save_to_csv(articles):
+    with open("articles.csv", "w", newline="", encoding="utf-8") as f:
+        writer = csv.writer(f)
+        writer.writerow(["Title", "Link"])
+        writer.writerows(articles)
+
+if __name__ == "__main__":
+    articles = fetch_articles()
+    save_to_csv(articles)
+    print(f"✅ {len(articles)} articles saved to articles.csv")
